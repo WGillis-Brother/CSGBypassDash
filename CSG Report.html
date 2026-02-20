@@ -1,0 +1,1842 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ticket Bypass Dashboard</title>
+
+  <!-- CSV parsing + charts -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0f1118;
+      --panel: #161b26;
+      --panel2: #1d2330;
+      --text: #f5f7ff;
+      --muted: #9ba8c6;
+      --accent: #7aa2ff;
+      --border: rgba(255,255,255,0.08);
+      --shadow: 0 25px 45px rgba(5,8,20,0.35);
+      --good: #4ade80;
+      --warn: #fbbf24;
+      --bad: #fb7185;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont;
+      background: radial-gradient(900px 600px at 10% -10%, rgba(122,162,255,0.15), transparent),
+                  radial-gradient(900px 500px at 90% 0%, rgba(251,113,133,0.10), transparent),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-y: scroll;
+      scrollbar-gutter: stable both-edges;
+    }
+    header {
+      padding: 16px 24px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(15,17,24,0.9);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .banner-flex {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .banner-left {
+      flex: 1 1 260px;
+      min-width: 220px;
+    }
+    h1 { margin: 0; font-size: 24px; letter-spacing: 0.3px; font-weight: 600; }
+    .sub { margin: 0; color: var(--muted); font-size: 13px; }
+    .wrap { padding: 20px 24px 48px; max-width: 1280px; margin: 0 auto; }
+    .row { display: grid; gap: 14px; }
+    .row.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .row.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @media (max-width: 1100px) { .row.cols-3 { grid-template-columns: 1fr; } .row.cols-2 { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      color: var(--text);
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+    .controls {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      align-items: center; justify-content: center;
+      margin-top: 8px;
+    }
+    .banner-flex .controls {
+      justify-content: flex-end;
+      margin-top: 0;
+      flex: 1 1 340px;
+    }
+    .controls-left {
+      display:flex;
+      flex-wrap:nowrap;
+      gap:12px;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .totalWrap {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:nowrap;
+    }
+    @media (max-width: 900px) {
+      .controls-left,
+      .totalWrap {
+        flex-wrap:wrap;
+        justify-content:center;
+      }
+    }
+    .tabBar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      margin-top: 6px;
+    }
+    .tabButton {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, border 0.2s ease;
+    }
+    .tabButton.active {
+      background: linear-gradient(120deg, #5c7cfa, #7aa2ff);
+      color: var(--text);
+      border-color: transparent;
+      box-shadow: 0 10px 25px rgba(122,162,255,0.35);
+    }
+    .topReasons {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .topReasons li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.02);
+    }
+    .topReasons li.topReasons-hot {
+      border-color: rgba(251,113,133,0.6);
+      background: rgba(251,113,133,0.08);
+      box-shadow: inset 0 0 0 1px rgba(251,113,133,0.3);
+    }
+    .topReasons li.topReasons-empty {
+      display: block;
+      text-align: center;
+    }
+    .topReasons .rank {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent);
+      min-width: 20px;
+      text-align: center;
+    }
+    .topReasons li.topReasons-hot .rank,
+    .topReasons li.topReasons-hot .reason-name {
+      color: var(--bad);
+    }
+    .topReasons .reason-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .topReasons .reason-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .pill {
+      display: inline-flex; align-items:center; gap:8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.02);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .pill.stretch {
+      min-width: 240px;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .pill-label { font-size: 12px; letter-spacing: 0.2px; color: var(--muted); }
+    .pill-value { font-size: 20px; font-weight: 600; color: var(--text); }
+    .pill-sub { font-size: 12px; color: var(--muted); }
+    input[type="file"] { color: var(--muted); font-family: inherit; }
+    .btn {
+      padding: 10px 16px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      background: linear-gradient(120deg, #5c7cfa, #7aa2ff);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 25px rgba(122,162,255,0.35); }
+    .note { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
+
+    .info-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      background: var(--panel2);
+      font-weight: 600;
+      cursor: help;
+      position: relative;
+    }
+    .info-dot .tooltip {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      width: 240px;
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(6px);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      z-index: 20;
+    }
+    .info-dot:hover .tooltip,
+    .info-dot:focus-visible .tooltip {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .tooltip strong { display:block; color: var(--text); font-size: 11px; letter-spacing: 0.2px; }
+    .tooltip div + div { margin-top: 8px; }
+
+    .kpis { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .kpi {
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.04);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent), var(--panel2);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .kpi .label { color: var(--text); font-size: 13px; font-weight: 600; letter-spacing: 0.2px; }
+    .kpi .value { font-size: 24px; margin-top: 6px; font-weight: 600; }
+    .kpi .hint { color: var(--muted); font-size: 11px; margin-top: 4px; }
+
+    .chartBox { height: 320px; }
+    .legendWrap { margin-top: 16px; }
+    .legendList {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px 12px;
+    }
+    .legendItem {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .legendSwatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    th, td {
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 12px 10px;
+      text-align: left;
+      vertical-align: top;
+      color: var(--text);
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: rgba(22,27,38,0.96);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      user-select: none;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.2px;
+      z-index: 2;
+    }
+    th:hover { color: var(--text); }
+    .sort-ind { margin-left: 6px; font-size: 11px; color: var(--accent); }
+    .tableWrap { max-height: 420px; overflow: auto; border-radius: 16px; border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.02); }
+    .panel.tallTable .tableWrap { max-height: min(640px, 70vh); }
+    @media (max-width: 980px) {
+      .panel.tallTable .tableWrap { max-height: 420px; }
+    }
+    tbody tr:nth-child(even) { background: rgba(255,255,255,0.01); }
+    tbody tr:hover { background: rgba(122,162,255,0.08); }
+    .muted { color: var(--muted); }
+    .badge {
+      display:inline-block;
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      background: rgba(15,19,32,0.55);
+    }
+    .ok { color: var(--good); }
+    .warn { color: var(--warn); }
+    .bad { color: var(--bad); }
+    .twoCol {
+      display:grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px;
+    }
+    @media (max-width: 980px) { .twoCol { grid-template-columns: 1fr; } }
+    code {
+      color: var(--accent);
+      background: rgba(255,255,255,0.05);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    details.math-notes {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.02);
+      padding: 14px 18px;
+      margin: 0;
+    }
+    details.math-notes summary {
+      cursor: pointer;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+    }
+    details.math-notes summary::marker { color: var(--accent); }
+    .math-notes-content {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .math-notes-content ul {
+      padding-left: 18px;
+      margin: 8px 0 14px;
+    }
+    .math-notes-content li { margin-bottom: 6px; }
+    .math-notes-content hr {
+      border: 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin: 14px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="banner-flex">
+        <div class="banner-left">
+          <h1>Ticket Bypass Dashboard</h1>
+          <p class="sub">Drop in your CSV → track bypass volume and response-time impact.</p>
+        </div>
+        <div class="controls">
+          <div class="controls-left">
+            <span class="pill">
+              <strong>CSV:</strong>
+              <input id="fileInput" type="file" accept=".csv,text/csv" />
+            </span>
+
+            <div class="totalWrap">
+              <span class="pill stretch">
+                <span class="pill-label">Total requests</span>
+                <span class="pill-value" id="bannerTotal">—</span>
+              </span>
+
+              <div class="info-dot" tabindex="0" aria-label="Bypass rules and time metric details">
+                ?
+                <div class="tooltip">
+                  <div>
+                    <strong>Bypass rule</strong>
+                    Rows where Better Avenue? starts with “Yes” or Reason Category mentions “bypass”.
+                  </div>
+                  <div>
+                    <strong>Time metric</strong>
+                    Initial Request to 1st Response (working hours only). Excluding Holidays and weekends. 
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabBar">
+        <button class="tabButton active" data-tab="overview">Overview</button>
+        <button class="tabButton" data-tab="sales">Sales</button>
+        <button class="tabButton" data-tab="customers">Customers</button>
+        <button class="tabButton" data-tab="dealers">Dealers</button>
+        <button class="tabButton" data-tab="other">Other</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="tab-panel active" data-tab="overview">
+    <div class="panel">
+      <h2>Key Metrics</h2>
+      <div class="kpis">
+        <div class="kpi">
+          <div class="label">Incidents Bypassed</div>
+          <div class="value" id="kpiBypassed">—</div>
+          <div class="hint muted">Better Avenue? starts “Yes” or Reason Category says “bypass”</div>
+        </div>
+        <div class="kpi">
+          <div class="label">% Bypassed</div>
+          <div class="value" id="kpiPct">—</div>
+          <div class="hint muted">Bypassed / total</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Avg Response Time</div>
+          <div class="value" id="kpiAvgHrs">—</div>
+          <div class="hint muted">Initial → 1st response</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Response Time Cost</div>
+          <div class="value" id="kpiTotalHrs">—</div>
+          <div class="hint muted">Sum of bypassed response hours</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="row cols-3">
+      <div class="panel">
+        <h2>Bypassed vs Not Bypassed</h2>
+        <div class="chartBox">
+          <canvas id="pieBypass"></canvas>
+        </div>
+        <div class="legendWrap" id="legendBypass"></div>
+        <p class="note">Shows how much volume bypasses tickets vs stays in-process.</p>
+      </div>
+
+      <div class="panel">
+        <h2>Reason Category Mix</h2>
+        <div class="chartBox">
+          <canvas id="pieReason"></canvas>
+        </div>
+        <div class="legendWrap" id="legendReason"></div>
+        <p class="note">Breaks down bypassed requests by Reason Category.</p>
+      </div>
+
+      <div class="panel">
+        <h2>Who’s Bypassing?</h2>
+        <div class="chartBox">
+          <canvas id="pieWho"></canvas>
+        </div>
+        <div class="legendWrap" id="legendWho"></div>
+        <p class="note">Dealer / Customer / Sales / Internal mix.</p>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="row cols-2">
+      <div class="panel tallTable">
+        <h2>Bypass Breakdown by Reason Category</h2>
+        <div class="tableWrap">
+          <table id="reasonTable">
+            <thead>
+              <tr>
+                <th data-type="text">Reason Category<span class="sort-ind"></span></th>
+                <th data-type="number">Count<span class="sort-ind"></span></th>
+                <th data-type="number">% of bypassed<span class="sort-ind"></span></th>
+                <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
+                <th data-type="number">Total hours (bypassed)<span class="sort-ind"></span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="note">Click any header to sort ascending/descending.</p>
+      </div>
+
+      <div class="panel">
+        <h2>Top 10 Reasons for Bypass</h2>
+        <ol class="topReasons" id="topBypassReasons">
+          <li class="muted topReasons-empty">Upload a CSV to populate this list.</li>
+        </ol>
+        <p class="note">Ranked by bypassed volume. Percentages reference total bypassed traffic.</p>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="row cols-2">
+      <div class="panel">
+        <h2>Escalation Origins (Requester Type + Name)</h2>
+        <div class="tableWrap">
+          <table id="originTable">
+            <thead>
+              <tr>
+                <th data-type="text">Origin<span class="sort-ind"></span></th>
+                <th data-type="number">Count<span class="sort-ind"></span></th>
+                <th data-type="number">% of bypassed<span class="sort-ind"></span></th>
+                <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
+                <th data-type="number">Total hours (bypassed)<span class="sort-ind"></span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="note">Shows who routed around tickets most often.</p>
+      </div>
+
+      <div class="panel">
+        <h2>Bypass Breakdown by “Who”</h2>
+        <div class="tableWrap">
+          <table id="whoTable">
+            <thead>
+              <tr>
+                <th data-type="text">Who<span class="sort-ind"></span></th>
+                <th data-type="number">Count<span class="sort-ind"></span></th>
+                <th data-type="number">% of bypassed<span class="sort-ind"></span></th>
+                <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
+                <th data-type="number">Total hours (bypassed)<span class="sort-ind"></span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="note">Derived from the part before “ - ” in Reason Category (e.g., “Dealer - …”).</p>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="panel">
+      <h2>Bypassed Requests</h2>
+      <p class="note">
+        Shows the first 250 bypassed rows (for performance). Row # aligns to the CSV so you can trace records quickly, and Response Time now displays fractional hours (or plain minutes when under an hour, or “Insufficient data” when timestamps are missing). Use your browser Find (Ctrl/Cmd+F) to filter.
+      </p>
+      <div class="tableWrap" style="max-height:520px;">
+        <table id="sampleTable">
+          <thead><tr id="sampleHead"></tr></thead>
+          <tbody id="sampleBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="row cols-2">
+      <div class="panel">
+        <h2>Column Mapping (auto-detected)</h2>
+        <div class="muted" id="mapping"></div>
+        <p class="note">
+          If the dashboard isn’t detecting correctly, open this HTML file and adjust the mapping logic in <code>detectColumns()</code>.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h2>Data Quality Checks</h2>
+        <div id="dq" class="muted" style="line-height:1.6">
+          Upload a CSV to see checks (missing timestamps, negative durations, etc.).
+        </div>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="panel">
+      <h2>Methodology Notes</h2>
+      <details class="math-notes">
+        <summary>Show the math behind these metrics</summary>
+        <div class="math-notes-content">
+          <p>All KPIs, charts, and tables lean on a shared set of rules so the counts stay in sync:</p>
+          <ul>
+            <li><strong>Bypassed count</strong>: a row qualifies when Better Avenue? starts with “Yes” or its Reason Category contains “bypass”.</li>
+            <li><strong>% bypassed</strong>: bypassed rows divided by total parsed rows, displayed as a percentage.</li>
+            <li><strong>Average response hours</strong>: arithmetic mean of the working-hour durations for all bypassed rows with valid timestamps.</li>
+            <li><strong>Total hours</strong>: sum of those same working-hour durations, capped at zero to avoid negative anomalies.</li>
+          </ul>
+          <hr>
+          <p>Working-hour durations strip out unwanted time so overnight, weekend, and holiday gaps do not inflate the totals:</p>
+          <ul>
+            <li>Only Monday–Friday windows between 08:00 and 18:00 local time count toward the duration.</li>
+            <li>Nights and weekends are skipped by advancing to the next valid workday before continuing the calculation.</li>
+            <li>U.S. holidays (New Year’s Day, MLK Day, Presidents Day, Memorial Day, Independence Day, Labor Day, Thanksgiving + day after, and Christmas) are also excluded via a cached lookup.</li>
+            <li>Durations accumulate day-by-day: for each qualifying day we add the overlap between the request/response timestamps and the work window, ensuring only productive hours remain.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+    </section>
+
+    <section class="tab-panel" data-tab="sales">
+      <div class="panel">
+        <h2>Sales Participation KPIs</h2>
+        <div class="kpis">
+          <div class="kpi">
+            <div class="label">Sales incidents</div>
+            <div class="value" id="salesTotal">—</div>
+            <div class="hint muted">Any row involving Sales (bypassed or not)</div>
+          </div>
+          <div class="kpi">
+            <div class="label">% of total incidents</div>
+            <div class="value" id="salesPct">—</div>
+            <div class="hint muted">Sales incidents / total rows</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Sales bypassed</div>
+            <div class="value" id="salesBypassed">—</div>
+            <div class="hint muted">Sales rows that sidestepped tickets</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Avg response (hrs)</div>
+            <div class="value" id="salesAvg">—</div>
+            <div class="hint muted">Working hours until first response</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:12px"></div>
+
+      <div class="row cols-2">
+        <div class="panel">
+          <h2>Sales Incidents by Month</h2>
+          <div class="chartBox">
+            <canvas id="salesMonthlyChart"></canvas>
+          </div>
+          <p class="note">Bars = Sales incidents per month, line = Sales % of all incidents for that month. Quick way to watch both volume and share.</p>
+        </div>
+
+        <div class="panel">
+          <h2>Top Sales Reasons</h2>
+          <div class="tableWrap">
+            <table id="salesReasonTable">
+              <thead>
+                <tr>
+                  <th data-type="text">Reason Category<span class="sort-ind"></span></th>
+                  <th data-type="text">Origin<span class="sort-ind"></span></th>
+                  <th data-type="number">Count<span class="sort-ind"></span></th>
+                  <th data-type="number">% of sales incidents<span class="sort-ind"></span></th>
+                  <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="note">Focuses on the top 10 drivers so we can see which Sales escalations stay open longest.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" data-tab="customers">
+      <div class="panel">
+        <h2>Customer Segment KPIs</h2>
+        <div class="kpis">
+          <div class="kpi">
+            <div class="label">Customer incidents</div>
+            <div class="value" id="customerTotal">—</div>
+            <div class="hint muted">Rows where customers drove the request</div>
+          </div>
+          <div class="kpi">
+            <div class="label">% of total incidents</div>
+            <div class="value" id="customerPct">—</div>
+            <div class="hint muted">Customer incidents / total rows</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Customer bypassed</div>
+            <div class="value" id="customerBypassed">—</div>
+            <div class="hint muted">Customer rows that skipped tickets</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Avg response (hrs)</div>
+            <div class="value" id="customerAvg">—</div>
+            <div class="hint muted">Working hours until first response</div>
+          </div>
+        </div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="panel">
+        <h2>Customer Reason Breakdown</h2>
+        <div class="tableWrap">
+          <table id="customerSegmentTable">
+            <thead>
+              <tr>
+                <th data-type="text">Reason Category<span class="sort-ind"></span></th>
+                <th data-type="number">Count<span class="sort-ind"></span></th>
+                <th data-type="number">% of customer incidents<span class="sort-ind"></span></th>
+                <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="note">Shows which customer requests show up most frequently and how long they take.</p>
+      </div>
+    </section>
+
+    <section class="tab-panel" data-tab="dealers">
+      <div class="panel">
+        <h2>Dealer Segment KPIs</h2>
+        <div class="kpis">
+          <div class="kpi">
+            <div class="label">Dealer incidents</div>
+            <div class="value" id="dealerTotal">—</div>
+            <div class="hint muted">Rows initiated by dealer teams</div>
+          </div>
+          <div class="kpi">
+            <div class="label">% of total incidents</div>
+            <div class="value" id="dealerPct">—</div>
+            <div class="hint muted">Dealer incidents / total rows</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Dealer bypassed</div>
+            <div class="value" id="dealerBypassed">—</div>
+            <div class="hint muted">Dealer rows that skipped tickets</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Avg response (hrs)</div>
+            <div class="value" id="dealerAvg">—</div>
+            <div class="hint muted">Working hours until first response</div>
+          </div>
+        </div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="panel">
+        <h2>Dealer Reason Breakdown</h2>
+        <div class="tableWrap">
+          <table id="dealerSegmentTable">
+            <thead>
+              <tr>
+                <th data-type="text">Reason Category<span class="sort-ind"></span></th>
+                <th data-type="number">Count<span class="sort-ind"></span></th>
+                <th data-type="number">% of dealer incidents<span class="sort-ind"></span></th>
+                <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="note">Use to spotlight which dealer interactions are draining the queue.</p>
+      </div>
+    </section>
+
+    <section class="tab-panel" data-tab="other">
+      <div class="panel">
+        <h2>Other Segment KPIs</h2>
+        <div class="kpis">
+          <div class="kpi">
+            <div class="label">Other incidents</div>
+            <div class="value" id="otherTotal">—</div>
+            <div class="hint muted">Internal, operations, marketing, etc.</div>
+          </div>
+          <div class="kpi">
+            <div class="label">% of total incidents</div>
+            <div class="value" id="otherPct">—</div>
+            <div class="hint muted">Other incidents / total rows</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Other bypassed</div>
+            <div class="value" id="otherBypassed">—</div>
+            <div class="hint muted">Other rows that skipped tickets</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Avg response (hrs)</div>
+            <div class="value" id="otherAvg">—</div>
+            <div class="hint muted">Working hours until first response</div>
+          </div>
+        </div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="panel">
+        <h2>Other Reason Breakdown</h2>
+        <div class="tableWrap">
+          <table id="otherSegmentTable">
+            <thead>
+              <tr>
+                <th data-type="text">Reason Category<span class="sort-ind"></span></th>
+                <th data-type="number">Count<span class="sort-ind"></span></th>
+                <th data-type="number">% of other incidents<span class="sort-ind"></span></th>
+                <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="note">Covers ops, product, finance, and any remaining categories.</p>
+      </div>
+    </section>
+  </div>
+
+<script>
+/**
+ * COLUMN DETECTION
+ * Tries to normalize header drift. Update this first when CSV exports change.
+ */
+function detectColumns(headers) {
+  const norm = (s) => (s || "").toLowerCase().replace(/\s+/g, " ").trim();
+
+  const find = (preds) => {
+    for (const h of headers) {
+      const n = norm(h);
+      if (preds.some(p => p(n))) return h;
+    }
+    return null;
+  };
+
+  const betterAvenue = find([
+    n => n.includes("better avenue"),
+    n => n === "better avenue?",
+    n => n.includes("better avenue?")
+  ]);
+
+  const reasonCategory = find([
+    n => n.includes("reason category"),
+    n => (n.includes("reason") && n.includes("category"))
+  ]);
+
+  const initialRequest = find([
+    n => n.includes("initial request"),
+    n => (n.includes("initial") && n.includes("request"))
+  ]);
+
+  const initialRequestTime = find([
+    n => n.includes("initial request timing"),
+    n => n.includes("initial request time"),
+    n => (n.includes("initial") && n.includes("timing"))
+  ]);
+
+  const firstResponse = find([
+    n => n.includes("1st response"),
+    n => n.includes("first response"),
+    n => (n.includes("1st") && n.includes("response")),
+    n => (n.includes("first") && n.includes("response"))
+  ]);
+
+  const firstResponseTime = find([
+    n => n.includes("1st response timing"),
+    n => n.includes("1st response time"),
+    n => n.includes("first response timing"),
+    n => n.includes("first response time"),
+    n => (n.includes("response") && n.includes("timing"))
+  ]);
+
+  const requesterType = find([
+    n => n === "requester type",
+    n => (n.includes("requester") && n.includes("type"))
+  ]);
+
+  const requesterName = find([
+    n => n === "requester name",
+    n => (n.includes("requester") && n.includes("name"))
+  ]);
+
+  const channel = find([
+    n => n.includes("channel"),
+    n => n.includes("subject line")
+  ]);
+
+  return { betterAvenue, reasonCategory, initialRequest, initialRequestTime, firstResponse, firstResponseTime, requesterType, requesterName, channel };
+}
+
+// Safely convert arbitrary timestamp strings into Date objects
+function toDate(val) {
+  if (val == null) return null;
+  const s = String(val).trim();
+  if (!s) return null;
+  const d = new Date(s);
+  if (!isFinite(d)) return null;
+  return d;
+}
+
+function combineDateTime(dateVal, timeVal) {
+  const datePart = (dateVal ?? "").toString().trim();
+  const timePart = (timeVal ?? "").toString().trim();
+  if (!datePart && !timePart) return null;
+  if (datePart && timePart) {
+    const combined = toDate(`${datePart} ${timePart}`);
+    if (combined) return combined;
+  }
+  return toDate(datePart || timePart);
+}
+
+function resolveTimestamp(row, dateKey, timeKey) {
+  const dateVal = dateKey ? row[dateKey] : null;
+  const timeVal = timeKey ? row[timeKey] : null;
+  return combineDateTime(dateVal, timeVal);
+}
+
+// Business rule: Better Avenue must explicitly start with "Yes"
+function containsYesTicket(val) {
+  if (val == null) return false;
+  const s = String(val).trim().toLowerCase();
+  return s.startsWith("yes");
+}
+
+// Business rule: any Reason Category mentioning "bypass" counts
+function reasonCategoryBypasses(val) {
+  if (val == null) return false;
+  return String(val).toLowerCase().includes("bypass");
+}
+
+// Consolidated bypass check shared across KPI + tables + DQ
+function isBypassEvent(betterAvenueVal, reasonCategoryVal) {
+  return containsYesTicket(betterAvenueVal) || reasonCategoryBypasses(reasonCategoryVal);
+}
+
+function getWho(reasonCategory) {
+  if (!reasonCategory) return "Unknown";
+  const s = String(reasonCategory);
+  const parts = s.split(" - ");
+  return parts[0]?.trim() || "Unknown";
+}
+
+function classifyWhoGroup(reasonCategory, requesterType) {
+  const reason = (reasonCategory ?? "").toString().toLowerCase();
+  const requester = (requesterType ?? "").toString().toLowerCase();
+  if (reason.includes("sales") || requester.includes("sales")) return "Sales";
+  if (reason.includes("dealer") || requester.includes("dealer")) return "Dealer";
+  if (reason.includes("customer") || requester.includes("customer")) return "Customer";
+  return "Other";
+}
+
+function isSalesInvolved(row) {
+  return (row?.__whoGroup || "").toLowerCase() === "sales";
+}
+
+// -----------------------------------------------------------------------------
+// Working-hour calculator (ignores nights, weekends, US holidays)
+// -----------------------------------------------------------------------------
+const WORK_START_HOUR = 8;
+const WORK_END_HOUR = 18;
+const holidayCache = new Map();
+
+function isWeekendDate(d) {
+  const day = d.getDay();
+  return day === 0 || day === 6;
+}
+
+function nthWeekdayOfMonth(year, month, weekday, nth) {
+  const date = new Date(year, month, 1);
+  while (date.getMonth() === month) {
+    if (date.getDay() === weekday) {
+      nth -= 1;
+      if (nth === 0) return new Date(date);
+    }
+    date.setDate(date.getDate() + 1);
+  }
+  return null;
+}
+
+function lastWeekdayOfMonth(year, month, weekday) {
+  const date = new Date(year, month + 1, 0);
+  while (date.getMonth() === month) {
+    if (date.getDay() === weekday) return new Date(date);
+    date.setDate(date.getDate() - 1);
+  }
+  return null;
+}
+
+function keyFromDate(d) {
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
+function getHolidayDates(year) {
+  if (holidayCache.has(year)) return holidayCache.get(year);
+  const holidays = new Set();
+  const add = (d) => { if (d) holidays.add(keyFromDate(d)); };
+
+  add(new Date(year, 0, 1)); // New Year's Day
+  add(nthWeekdayOfMonth(year, 0, 1, 3)); // MLK Day (3rd Monday Jan)
+  add(nthWeekdayOfMonth(year, 1, 1, 3)); // President's Day (3rd Monday Feb)
+  add(lastWeekdayOfMonth(year, 4, 1)); // Memorial Day (last Monday May)
+  add(new Date(year, 6, 4)); // Independence Day
+  add(nthWeekdayOfMonth(year, 8, 1, 1)); // Labor Day (1st Monday Sep)
+  const thanksgiving = nthWeekdayOfMonth(year, 10, 4, 4); // 4th Thursday Nov
+  add(thanksgiving);
+  if (thanksgiving) {
+    const dayAfter = new Date(thanksgiving);
+    dayAfter.setDate(dayAfter.getDate() + 1);
+    add(dayAfter);
+  }
+  add(new Date(year, 11, 25)); // Christmas Day
+
+  holidayCache.set(year, holidays);
+  return holidays;
+}
+
+function isHolidayDate(d) {
+  return getHolidayDates(d.getFullYear()).has(keyFromDate(d));
+}
+
+function isNonWorkingDate(d) {
+  return isWeekendDate(d) || isHolidayDate(d);
+}
+
+function startOfWorkday(d) {
+  const next = new Date(d);
+  next.setHours(WORK_START_HOUR, 0, 0, 0);
+  return next;
+}
+
+function endOfWorkday(d) {
+  const next = new Date(d);
+  next.setHours(WORK_END_HOUR, 0, 0, 0);
+  return next;
+}
+
+function advanceToNextWorkday(d) {
+  const next = new Date(d);
+  next.setDate(next.getDate() + 1);
+  next.setHours(WORK_START_HOUR, 0, 0, 0);
+  while (isNonWorkingDate(next)) {
+    next.setDate(next.getDate() + 1);
+  }
+  next.setHours(WORK_START_HOUR, 0, 0, 0);
+  return next;
+}
+
+// Calculates duration using only working hours (Mon-Fri, 8a-6p)
+function hoursBetween(a, b) {
+  if (!a || !b) return null;
+  const ms = b - a;
+  if (!isFinite(ms)) return null;
+  if (ms < 0) return ms / 36e5;
+
+  let current = new Date(a);
+  const end = new Date(b);
+  let totalMs = 0;
+
+  while (current < end) {
+    if (isNonWorkingDate(current)) {
+      current = advanceToNextWorkday(current);
+      continue;
+    }
+
+    const dayStart = startOfWorkday(current);
+    const dayEnd = endOfWorkday(current);
+    const windowStart = current > dayStart ? current : dayStart;
+    const windowEnd = end < dayEnd ? end : dayEnd;
+
+    if (windowStart < windowEnd) {
+      totalMs += windowEnd - windowStart;
+    }
+
+    current = advanceToNextWorkday(dayStart);
+  }
+
+  return totalMs / 36e5;
+}
+
+// Formatting helpers keep UI copy consistent
+function fmtNumber(x, digits=0) {
+  if (x == null || !isFinite(x)) return "—";
+  return x.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits });
+}
+
+function fmtPct(x, digits=2) {
+  if (x == null || !isFinite(x)) return "—";
+  return `${x.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits })}%`;
+}
+
+function formatResponseTime(hours) {
+  if (hours == null || !isFinite(hours) || hours < 0) return "Insufficient data";
+  if (hours >= 1) return `${fmtNumber(hours, 2)} hrs`;
+  const minutes = Math.round(hours * 60);
+  const label = minutes === 1 ? "min" : "mins";
+  return `${minutes} ${label}`;
+}
+
+function cleanText(val, fallback="Unknown") {
+  const s = (val ?? "").toString().trim();
+  return s || fallback;
+}
+
+function setTableEmpty(tableId, columnsLength, message) {
+  const tbody = document.querySelector(`#${tableId} tbody`);
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  const tr = document.createElement("tr");
+  const td = document.createElement("td");
+  td.colSpan = columnsLength || 1;
+  td.textContent = message;
+  td.className = "muted";
+  tr.appendChild(td);
+  tbody.appendChild(tr);
+}
+
+// Chart.js instances are torn down/recreated per upload
+let chartBypass = null;
+let chartReason = null;
+let chartWho = null;
+let chartSalesMonthly = null;
+
+function setKpis({ total, bypassed, pct, avgHrs, totalHrs }) {
+  const bannerTotal = document.getElementById("bannerTotal");
+  if (bannerTotal) bannerTotal.textContent = fmtNumber(total);
+  const bypassVal = fmtNumber(bypassed);
+  document.getElementById("kpiBypassed").textContent = bypassVal === "—" ? "—" : `${bypassVal} Incidents`;
+  document.getElementById("kpiPct").textContent = fmtPct(pct, 2);
+
+  // Add a little severity coloring on bypass pct
+  const pctEl = document.getElementById("kpiPct");
+  pctEl.classList.remove("ok","warn","bad");
+  if (pct >= 50) pctEl.classList.add("bad");
+  else if (pct >= 25) pctEl.classList.add("warn");
+  else pctEl.classList.add("ok");
+
+  const avgVal = fmtNumber(avgHrs, 2);
+  document.getElementById("kpiAvgHrs").textContent = avgVal === "—" ? "—" : `${avgVal} hrs`;
+
+  const totalVal = fmtNumber(totalHrs, 0);
+  document.getElementById("kpiTotalHrs").textContent = totalVal === "—" ? "—" : `${totalVal} hrs lost`;
+}
+
+function destroyCharts() {
+  if (chartBypass) { chartBypass.destroy(); chartBypass = null; }
+  if (chartReason) { chartReason.destroy(); chartReason = null; }
+  if (chartWho) { chartWho.destroy(); chartWho = null; }
+  if (chartSalesMonthly) { chartSalesMonthly.destroy(); chartSalesMonthly = null; }
+  clearLegend("legendBypass");
+  clearLegend("legendReason");
+  clearLegend("legendWho");
+}
+
+function clearLegend(id) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = "";
+}
+
+function renderLegend(chart, legendId) {
+  if (!legendId) return;
+  const container = document.getElementById(legendId);
+  if (!container) return;
+  const items = chart.options.plugins.legend.labels.generateLabels(chart);
+  const listItems = items.map(item => (
+    `<li class="legendItem">
+      <span class="legendSwatch" style="background:${item.fillStyle}; opacity:${item.hidden ? 0.35 : 1};"></span>
+      <span>${item.text}</span>
+    </li>`
+  )).join("");
+  container.innerHTML = `<ul class="legendList">${listItems}</ul>`;
+}
+
+function makePie(canvasId, labels, values, titleText, legendId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+
+  const legendEl = legendId ? document.getElementById(legendId) : null;
+  const hasData = Array.isArray(labels) && labels.length && values.some(v => v != null && isFinite(v) && v > 0);
+  if (!hasData) {
+    const ctx = canvas.getContext("2d");
+    if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (legendEl) legendEl.innerHTML = "<p class=\"muted\">No data available.</p>";
+    return null;
+  }
+
+  const chart = new Chart(canvas, {
+    type: "pie",
+    data: {
+      labels,
+      datasets: [{ data: values }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        title: { display: true, text: titleText, color: "#e9eefc", font: { size: 13 } }
+      }
+    }
+  });
+
+  renderLegend(chart, legendId);
+  return chart;
+}
+
+// Data-quality summary to call out missing timestamps immediately
+function summarizeDQ(rows, cols) {
+  const { betterAvenue, reasonCategory, initialRequest, initialRequestTime, firstResponse, firstResponseTime } = cols;
+
+  let missingBetter = 0, missingReason = 0, missingInit = 0, missingFirst = 0;
+  let bypassed = 0;
+  let missingDuration = 0, negativeDuration = 0;
+
+  for (const r of rows) {
+    if (!r[betterAvenue]) missingBetter++;
+    if (!r[reasonCategory]) missingReason++;
+    const init = resolveTimestamp(r, initialRequest, initialRequestTime);
+    const first = resolveTimestamp(r, firstResponse, firstResponseTime);
+    if (!init) missingInit++;
+    if (!first) missingFirst++;
+
+    const isBypass = isBypassEvent(r[betterAvenue], r[reasonCategory]);
+    if (isBypass) {
+      bypassed++;
+      const h = hoursBetween(init, first);
+      if (h == null) missingDuration++;
+      else if (h < 0) negativeDuration++;
+    }
+  }
+
+  const dq = document.getElementById("dq");
+  const lines = [
+    `<div><span class="badge">Missing Better Avenue?</span> <strong>${missingBetter}</strong></div>`,
+    `<div><span class="badge">Missing Reason Category</span> <strong>${missingReason}</strong></div>`,
+    `<div><span class="badge">Missing Initial Request</span> <strong>${missingInit}</strong></div>`,
+    `<div><span class="badge">Missing 1st Response</span> <strong>${missingFirst}</strong></div>`,
+    `<hr style="border:0;border-top:1px solid var(--border);margin:10px 0;">`,
+    `<div><span class="badge">Bypassed rows</span> <strong>${bypassed}</strong></div>`,
+    `<div><span class="badge">Bypassed rows missing duration</span> <strong>${missingDuration}</strong></div>`,
+    `<div><span class="badge">Bypassed rows negative duration</span> <strong>${negativeDuration}</strong></div>`
+  ];
+  dq.innerHTML = lines.join("");
+}
+
+// Simple grouping utility used by tables + pie charts
+function groupStats(rows, keyFn) {
+  const m = new Map();
+  for (const r of rows) {
+    const k = keyFn(r);
+    if (!m.has(k)) m.set(k, { key: k, count: 0, sumHrs: 0, avgHrs: null, origins: new Map() });
+    const g = m.get(k);
+    g.count += 1;
+    const h = r.__respHours;
+    if (h != null && isFinite(h)) g.sumHrs += h;
+    if (r.__whoGroup) {
+      const originKey = r.__whoGroup;
+      g.origins.set(originKey, (g.origins.get(originKey) || 0) + 1);
+    }
+  }
+  const arr = Array.from(m.values());
+  for (const g of arr) {
+    g.avgHrs = g.count ? (g.sumHrs / g.count) : null;
+  }
+  // default sort by count desc
+  arr.sort((a,b) => b.count - a.count);
+  return arr;
+}
+
+// Table renderer with graceful empty-state handling
+function fillTable(tableId, rows, columns, emptyMessage="No rows to display.") {
+  const tbody = document.querySelector(`#${tableId} tbody`);
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (!rows.length) {
+    setTableEmpty(tableId, columns.length, emptyMessage);
+    return;
+  }
+  for (const r of rows) {
+    const tr = document.createElement("tr");
+    for (const c of columns) {
+      const td = document.createElement("td");
+      td.textContent = c.format ? c.format(r[c.key]) : (r[c.key] ?? "");
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  makeSortable(document.getElementById(tableId));
+}
+
+// Adds basic click-to-sort behavior for any generated table
+function makeSortable(table) {
+  // simple sortable: toggles ASC/DESC on click; supports number/text types
+  const ths = table.querySelectorAll("thead th");
+  const tbody = table.querySelector("tbody");
+  if (!tbody) return;
+
+  ths.forEach((th, idx) => {
+    th.onclick = () => {
+      const type = th.getAttribute("data-type") || "text";
+      const current = th.getAttribute("data-sort") || "none";
+      const next = current === "asc" ? "desc" : "asc";
+
+      // reset indicators
+      ths.forEach(h => {
+        h.setAttribute("data-sort", "none");
+        const ind = h.querySelector(".sort-ind");
+        if (ind) ind.textContent = "";
+      });
+
+      th.setAttribute("data-sort", next);
+      const ind = th.querySelector(".sort-ind");
+      if (ind) ind.textContent = next === "asc" ? "▲" : "▼";
+
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      rows.sort((a,b) => {
+        const ax = a.children[idx]?.textContent?.trim() ?? "";
+        const bx = b.children[idx]?.textContent?.trim() ?? "";
+        if (type === "number") {
+          const an = parseFloat(ax.replace(/,/g,""));
+          const bn = parseFloat(bx.replace(/,/g,""));
+          const av = isFinite(an) ? an : -Infinity;
+          const bv = isFinite(bn) ? bn : -Infinity;
+          return next === "asc" ? (av - bv) : (bv - av);
+        } else {
+          const cmp = ax.localeCompare(bx, undefined, { numeric: true, sensitivity: "base" });
+          return next === "asc" ? cmp : -cmp;
+        }
+      });
+      rows.forEach(r => tbody.appendChild(r));
+    };
+  });
+}
+
+// Show the first ~250 bypassed rows for anecdotal review
+function renderSampleTable(bypassedRowsRaw, headers, cols) {
+  const sample = bypassedRowsRaw.slice(0, 250);
+  const headRow = document.getElementById("sampleHead");
+  const body = document.getElementById("sampleBody");
+  headRow.innerHTML = "";
+  body.innerHTML = "";
+
+  const columns = [
+    {
+      label: "Row #",
+      type: "number",
+      getter: (row) => row.__rowNum ?? "—"
+    },
+    {
+      label: "Reason Category",
+      type: "text",
+      getter: (row) => cleanText(row[cols.reasonCategory], "Unknown")
+    },
+    {
+      label: "Response Time",
+      type: "text",
+      getter: (row) => formatResponseTime(row.__respHours)
+    },
+    {
+      label: "Requester Type",
+      type: "text",
+      getter: (row) => cols.requesterType ? cleanText(row[cols.requesterType], "Unknown") : "Not mapped"
+    },
+    {
+      label: "Requester Name",
+      type: "text",
+      getter: (row) => cols.requesterName ? cleanText(row[cols.requesterName], "Unnamed") : "Not mapped"
+    }
+  ];
+
+  columns.forEach(col => {
+    const th = document.createElement("th");
+    th.textContent = col.label;
+    th.setAttribute("data-type", col.type);
+    const ind = document.createElement("span");
+    ind.className = "sort-ind";
+    th.appendChild(ind);
+    headRow.appendChild(th);
+  });
+
+  if (!sample.length) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = columns.length;
+    td.textContent = "No bypassed requests detected.";
+    td.className = "muted";
+    tr.appendChild(td);
+    body.appendChild(tr);
+    return;
+  }
+
+  sample.forEach(row => {
+    const tr = document.createElement("tr");
+    columns.forEach(col => {
+      const td = document.createElement("td");
+      td.textContent = col.getter(row);
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+
+  const table = document.getElementById("sampleTable");
+  makeSortable(table);
+}
+
+// Display which columns were auto-mapped so manual tweaks are easy
+function renderMapping(cols) {
+  const el = document.getElementById("mapping");
+  const entries = Object.entries(cols).map(([k,v]) => {
+    const label = k.replace(/([A-Z])/g, " $1").replace(/^./, c => c.toUpperCase());
+    return `<div><span class="badge">${label}</span> <strong>${v ?? "NOT FOUND"}</strong></div>`;
+  });
+  el.innerHTML = entries.join("");
+}
+
+function dominantOrigin(originMap) {
+  if (!originMap || !originMap.size) return "Unknown";
+  let topKey = "Unknown";
+  let topCount = -1;
+  for (const [key, count] of originMap.entries()) {
+    if (count > topCount) {
+      topCount = count;
+      topKey = key;
+    }
+  }
+  return topKey;
+}
+
+function renderSegmentKpis(prefix, segmentRows, totalRows) {
+  const total = segmentRows.length;
+  const pct = totalRows ? (total / totalRows * 100) : 0;
+  const bypassed = segmentRows.filter(r => r.__isBypassed).length;
+  const hrs = segmentRows.map(r => r.__respHours).filter(h => h != null && isFinite(h) && h >= 0);
+  const avg = hrs.length ? (hrs.reduce((a,b) => a + b, 0) / hrs.length) : null;
+
+  const setText = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+
+  setText(`${prefix}Total`, fmtNumber(total, 0));
+  setText(`${prefix}Pct`, fmtPct(pct, 2));
+  setText(`${prefix}Bypassed`, fmtNumber(bypassed, 0));
+  setText(`${prefix}Avg`, fmtNumber(avg, 2));
+}
+
+function renderReasonBreakdown(rows, cols, tableId, totalCount, limit=null, options={}) {
+  if (!document.getElementById(tableId)) return;
+  const stats = groupStats(rows, r => cleanText(r[cols.reasonCategory], "Unknown"));
+  const sliced = typeof limit === "number" ? stats.slice(0, limit) : stats;
+  const includeOrigin = options.includeOrigin;
+  const formatted = sliced.map(g => ({
+    reason: g.key,
+    origin: includeOrigin ? dominantOrigin(g.origins) : undefined,
+    count: g.count,
+    pct: totalCount ? (g.count / totalCount * 100) : 0,
+    avg: g.avgHrs
+  }));
+
+  const columns = [
+    { key: "reason", format: v => v }
+  ];
+  if (includeOrigin) columns.push({ key: "origin", format: v => v || "Unknown" });
+  columns.push(
+    { key: "count", format: v => fmtNumber(v,0) },
+    { key: "pct", format: v => fmtPct(v,2) },
+    { key: "avg", format: v => fmtNumber(v,2) }
+  );
+
+  fillTable(tableId, formatted, columns, "No incidents found for this slice.");
+}
+
+function renderTopBypassReasons(reasonStats, bypassedCount) {
+  const list = document.getElementById("topBypassReasons");
+  if (!list) return;
+  list.innerHTML = "";
+
+  if (!reasonStats.length) {
+    const li = document.createElement("li");
+    li.className = "muted topReasons-empty";
+    li.textContent = "No bypassed requests yet.";
+    list.appendChild(li);
+    return;
+  }
+
+  const top = reasonStats.slice(0, 10);
+  top.forEach((item, idx) => {
+    const li = document.createElement("li");
+    if (idx < 5) li.classList.add("topReasons-hot");
+    const rank = document.createElement("span");
+    rank.className = "rank";
+    rank.textContent = idx + 1;
+
+    const body = document.createElement("div");
+    const name = document.createElement("div");
+    name.className = "reason-name";
+    name.textContent = item.key;
+
+    const pct = bypassedCount ? (item.count / bypassedCount * 100) : 0;
+    const meta = document.createElement("div");
+    meta.className = "reason-meta";
+    meta.textContent = `${fmtNumber(item.count, 0)} • ${fmtPct(pct, 1)}`;
+
+    body.appendChild(name);
+    body.appendChild(meta);
+    li.appendChild(rank);
+    li.appendChild(body);
+    list.appendChild(li);
+  });
+}
+
+function monthlyCount(rows) {
+  const map = new Map();
+  for (const r of rows) {
+    const d = r.__init;
+    if (!d) continue;
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    map.set(key, (map.get(key) || 0) + 1);
+  }
+  return map;
+}
+
+function formatMonthKey(key) {
+  const [year, month] = key.split("-").map(Number);
+  if (!year || !month) return key;
+  const date = new Date(year, month - 1, 1);
+  return date.toLocaleString(undefined, { month: "short", year: "numeric" });
+}
+
+function renderSalesTab(rows, cols, totalRows) {
+  const salesRows = rows.filter(r => isSalesInvolved(r));
+  renderSegmentKpis("sales", salesRows, totalRows);
+
+  const canvas = document.getElementById("salesMonthlyChart");
+  if (canvas) {
+    const allCounts = monthlyCount(rows);
+    const salesCounts = monthlyCount(salesRows);
+    const labelsKeys = Array.from(salesCounts.keys()).sort();
+
+    if (!labelsKeys.length) {
+      if (chartSalesMonthly) { chartSalesMonthly.destroy(); chartSalesMonthly = null; }
+      const ctx = canvas.getContext("2d");
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+
+    const labels = labelsKeys.map(formatMonthKey);
+    const salesVals = labelsKeys.map(key => salesCounts.get(key) || 0);
+    const shares = labelsKeys.map(key => {
+      const total = allCounts.get(key) || 0;
+      const salesVal = salesCounts.get(key) || 0;
+      return total ? (salesVal / total * 100) : 0;
+    });
+
+    if (chartSalesMonthly) { chartSalesMonthly.destroy(); chartSalesMonthly = null; }
+    chartSalesMonthly = new Chart(canvas, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Sales incidents",
+            data: salesVals,
+            backgroundColor: "rgba(90,115,196,0.6)",
+            borderColor: "rgba(90,115,196,1)",
+            borderWidth: 1,
+            yAxisID: "y"
+          },
+          {
+            label: "Sales % of total",
+            type: "line",
+            data: shares,
+            borderColor: "#fb7185",
+            backgroundColor: "#fb7185",
+            tension: 0.3,
+            borderWidth: 2,
+            fill: false,
+            pointRadius: 3,
+            yAxisID: "y1"
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { color: "#d6dcf7" },
+            grid: { color: "rgba(255,255,255,0.08)" },
+            title: { display: true, text: "Sales incidents", color: "#d6dcf7" }
+          },
+          y1: {
+            beginAtZero: true,
+            position: "right",
+            grid: { drawOnChartArea: false },
+            ticks: {
+              color: "#d6dcf7",
+              callback: (value) => `${value}%`
+            },
+            title: { display: true, text: "Sales % of total", color: "#d6dcf7" }
+          },
+          x: { ticks: { color: "#d6dcf7" }, grid: { color: "rgba(255,255,255,0.04)" } }
+        },
+        plugins: {
+          legend: { labels: { color: "#d6dcf7" } }
+        }
+      }
+    });
+  }
+
+  renderReasonBreakdown(salesRows, cols, "salesReasonTable", salesRows.length, 10, { includeOrigin: true });
+}
+
+function renderSegmentTab(segmentName, rows, cols, totalRows) {
+  const segmentRows = rows.filter(r => (r.__whoGroup || "").toLowerCase() === segmentName.toLowerCase());
+  const prefix = segmentName.toLowerCase();
+  renderSegmentKpis(prefix, segmentRows, totalRows);
+  const tableId = `${prefix}SegmentTable`;
+  renderReasonBreakdown(segmentRows, cols, tableId, segmentRows.length);
+}
+
+// Main pipeline orchestrator
+function buildDashboard(data, headers) {
+  const cols = detectColumns(headers);
+  renderMapping(cols);
+
+  // Validate required columns
+  const required = ["betterAvenue","reasonCategory","initialRequest","firstResponse"];
+  const missing = required.filter(k => !cols[k]);
+  if (missing.length) {
+    alert("Could not detect required columns: " + missing.join(", ") +
+          "\n\nOpen the HTML and adjust detectColumns() to match your CSV headers.");
+    return;
+  }
+
+  // Compute response hours per row
+  const rows = data.map((r, idx) => {
+    const init = resolveTimestamp(r, cols.initialRequest, cols.initialRequestTime);
+    const first = resolveTimestamp(r, cols.firstResponse, cols.firstResponseTime);
+    const respHrs = hoursBetween(init, first);
+    const bypassFlag = isBypassEvent(r[cols.betterAvenue], r[cols.reasonCategory]);
+    const requesterVal = cols.requesterType ? r[cols.requesterType] : "";
+    const whoGroup = classifyWhoGroup(r[cols.reasonCategory], requesterVal);
+    return {
+      ...r,
+      __init: init,
+      __first: first,
+      __respHours: (respHrs != null && isFinite(respHrs)) ? respHrs : null,
+      __rowNum: idx + 2, // +2 to account for the header row in the CSV
+      __isBypassed: bypassFlag,
+      __whoGroup: whoGroup
+    };
+  });
+
+  const total = rows.length;
+  const bypassedRows = rows.filter(r => r.__isBypassed);
+  const bypassed = bypassedRows.length;
+  const pct = total ? (bypassed / total * 100) : 0;
+
+  // Avg + total hours (bypassed)
+  const hrs = bypassedRows.map(r => r.__respHours).filter(h => h != null && isFinite(h) && h >= 0);
+  const totalHrs = hrs.reduce((a,b) => a + b, 0);
+  const avgHrs = hrs.length ? (totalHrs / hrs.length) : null;
+
+  setKpis({ total, bypassed, pct, avgHrs, totalHrs });
+
+  // DQ
+  summarizeDQ(rows, cols);
+
+  // Group by Reason Category
+  const reasonStats = groupStats(bypassedRows, r => (r[cols.reasonCategory] || "Unknown"));
+  const reasonTableRows = reasonStats.map(g => ({
+    reason: g.key,
+    count: g.count,
+    pct: bypassed ? (g.count / bypassed * 100) : 0,
+    avg: g.avgHrs,
+    totalHrs: g.sumHrs
+  }));
+  fillTable("reasonTable", reasonTableRows, [
+    { key: "reason", format: v => v },
+    { key: "count", format: v => fmtNumber(v,0) },
+    { key: "pct", format: v => fmtPct(v,2) },
+    { key: "avg", format: v => fmtNumber(v,2) },
+    { key: "totalHrs", format: v => fmtNumber(v,0) }
+  ]);
+  renderTopBypassReasons(reasonStats, bypassed);
+
+  // Group by Who (Dealer/Customer/Sales/Internal)
+  const whoStats = groupStats(bypassedRows, r => getWho(r[cols.reasonCategory]));
+  const whoTableRows = whoStats.map(g => ({
+    who: g.key,
+    count: g.count,
+    pct: bypassed ? (g.count / bypassed * 100) : 0,
+    avg: g.avgHrs,
+    totalHrs: g.sumHrs
+  }));
+  fillTable("whoTable", whoTableRows, [
+    { key: "who", format: v => v },
+    { key: "count", format: v => fmtNumber(v,0) },
+    { key: "pct", format: v => fmtPct(v,2) },
+    { key: "avg", format: v => fmtNumber(v,2) },
+    { key: "totalHrs", format: v => fmtNumber(v,0) }
+  ]);
+
+  const originColumns = [
+    { key: "origin", format: v => v },
+    { key: "count", format: v => fmtNumber(v,0) },
+    { key: "pct", format: v => fmtPct(v,2) },
+    { key: "avg", format: v => fmtNumber(v,2) },
+    { key: "totalHrs", format: v => fmtNumber(v,0) }
+  ];
+  if (cols.requesterType && cols.requesterName) {
+    const originStats = groupStats(
+      bypassedRows,
+      r => `${cleanText(r[cols.requesterType], "Unknown Type")} - ${cleanText(r[cols.requesterName], "Unnamed")}`
+    );
+    const originRows = originStats.map(g => ({
+      origin: g.key,
+      count: g.count,
+      pct: bypassed ? (g.count / bypassed * 100) : 0,
+      avg: g.avgHrs,
+      totalHrs: g.sumHrs
+    }));
+    fillTable("originTable", originRows, originColumns, "No bypassed requests with requester info.");
+  } else {
+    setTableEmpty("originTable", originColumns.length, "Requester Type/Name columns not detected. Update detectColumns().");
+  }
+
+  // Charts
+  destroyCharts();
+  chartBypass = makePie(
+    "pieBypass",
+    ["Bypassed (should’ve been ticket)", "Not bypassed"],
+    [bypassed, Math.max(0, total - bypassed)],
+    "Bypassed vs Not Bypassed",
+    "legendBypass"
+  );
+
+  // For reason pie: show top 8 + "Other"
+  const topN = 8;
+  const top = reasonTableRows.slice(0, topN);
+  const otherCount = reasonTableRows.slice(topN).reduce((s,r) => s + r.count, 0);
+  const reasonLabels = top.map(r => r.reason);
+  const reasonValues = top.map(r => r.count);
+  if (otherCount > 0) { reasonLabels.push("Other"); reasonValues.push(otherCount); }
+
+  chartReason = makePie(
+    "pieReason",
+    reasonLabels,
+    reasonValues,
+    "Reason Category Distribution (Bypassed)",
+    "legendReason"
+  );
+
+  const whoTopN = 8;
+  const whoTop = whoTableRows.slice(0, whoTopN);
+  const whoOther = whoTableRows.slice(whoTopN).reduce((s,r) => s + r.count, 0);
+  const whoLabels = whoTop.map(r => r.who);
+  const whoValues = whoTop.map(r => r.count);
+  if (whoOther > 0) {
+    whoLabels.push("Other");
+    whoValues.push(whoOther);
+  }
+
+  chartWho = makePie(
+    "pieWho",
+    whoLabels,
+    whoValues,
+    "Who’s Bypassing?",
+    "legendWho"
+  );
+
+  // Sample table of bypassed requests
+  renderSampleTable(bypassedRows, headers, cols);
+
+  // Tab-specific renders
+  renderSalesTab(rows, cols, total);
+  renderSegmentTab("Customer", rows, cols, total);
+  renderSegmentTab("Dealer", rows, cols, total);
+  renderSegmentTab("Other", rows, cols, total);
+}
+
+// Wire up CSV upload to PapaParse
+document.getElementById("fileInput").addEventListener("change", (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    dynamicTyping: false,
+    complete: (results) => {
+      const data = results.data || [];
+      const headers = results.meta?.fields || Object.keys(data[0] || {});
+      buildDashboard(data, headers);
+    },
+    error: (err) => alert("CSV parse error: " + err.message)
+  });
+});
+
+function setupTabs() {
+  const buttons = document.querySelectorAll(".tabButton");
+  const panels = document.querySelectorAll(".tab-panel");
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+      buttons.forEach(b => b.classList.toggle("active", b.dataset.tab === target));
+      panels.forEach(panel => panel.classList.toggle("active", panel.dataset.tab === target));
+    });
+  });
+}
+
+setupTabs();
+
+</script>
+</body>
+</html>
+
