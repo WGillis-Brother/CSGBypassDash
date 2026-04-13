@@ -35,11 +35,9 @@
                   var(--bg);
       color: var(--text);
       min-height: 100vh;
-      overflow-y: scroll;
-      scrollbar-gutter: stable both-edges;
     }
     header {
-      padding: 16px 24px 10px;
+      padding: 24px 24px 18px;
       border-bottom: 1px solid rgba(255,255,255,0.06);
       background: rgba(15,17,24,0.9);
       backdrop-filter: blur(12px);
@@ -48,27 +46,16 @@
       z-index: 10;
     }
     .header-inner {
-      max-width: 1200px;
+      max-width: 900px;
       margin: 0 auto;
-      text-align: left;
+      text-align: center;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
-    .banner-flex {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-    .banner-left {
-      flex: 1 1 260px;
-      min-width: 220px;
-    }
-    h1 { margin: 0; font-size: 24px; letter-spacing: 0.3px; font-weight: 600; }
-    .sub { margin: 0; color: var(--muted); font-size: 13px; }
-    .wrap { padding: 20px 24px 48px; max-width: 1280px; margin: 0 auto; }
+    h1 { margin: 0; font-size: 26px; letter-spacing: 0.3px; font-weight: 600; }
+    .sub { margin: 0; color: var(--muted); font-size: 14px; }
+    .wrap { padding: 24px 24px 48px; max-width: 1280px; margin: 0 auto; }
     .row { display: grid; gap: 14px; }
     .row.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .row.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -92,109 +79,10 @@
     .controls {
       display: flex; flex-wrap: wrap; gap: 12px;
       align-items: center; justify-content: center;
-      margin-top: 8px;
+      margin-top: 12px;
     }
-    .banner-flex .controls {
-      justify-content: flex-end;
-      margin-top: 0;
-      flex: 1 1 340px;
-    }
-    .controls-left {
-      display:flex;
-      flex-wrap:nowrap;
-      gap:12px;
-      align-items:center;
-      justify-content:flex-end;
-    }
-    .totalWrap {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:nowrap;
-    }
-    @media (max-width: 900px) {
-      .controls-left,
-      .totalWrap {
-        flex-wrap:wrap;
-        justify-content:center;
-      }
-    }
-    .tabBar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      padding-top: 12px;
-      border-top: 1px solid var(--border);
-      margin-top: 6px;
-    }
-    .tabButton {
-      padding: 10px 18px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.05);
-      color: var(--muted);
-      font-size: 13px;
-      letter-spacing: 0.2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease, border 0.2s ease;
-    }
-    .tabButton.active {
-      background: linear-gradient(120deg, #5c7cfa, #7aa2ff);
-      color: var(--text);
-      border-color: transparent;
-      box-shadow: 0 10px 25px rgba(122,162,255,0.35);
-    }
-    .topReasons {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .topReasons li {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 10px 12px;
-      background: rgba(255,255,255,0.02);
-    }
-    .topReasons li.topReasons-hot {
-      border-color: rgba(251,113,133,0.6);
-      background: rgba(251,113,133,0.08);
-      box-shadow: inset 0 0 0 1px rgba(251,113,133,0.3);
-    }
-    .topReasons li.topReasons-empty {
-      display: block;
-      text-align: center;
-    }
-    .topReasons .rank {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--accent);
-      min-width: 20px;
-      text-align: center;
-    }
-    .topReasons li.topReasons-hot .rank,
-    .topReasons li.topReasons-hot .reason-name {
-      color: var(--bad);
-    }
-    .topReasons .reason-name {
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--text);
-    }
-    .topReasons .reason-meta {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+    .controls-left { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:center; }
+    .controls-right { display:flex; align-items:center; gap:10px; }
     .pill {
       display: inline-flex; align-items:center; gap:8px;
       padding: 10px 14px;
@@ -279,7 +167,7 @@
       background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent), var(--panel2);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     }
-    .kpi .label { color: var(--text); font-size: 13px; font-weight: 600; letter-spacing: 0.2px; }
+    .kpi .label { color: var(--muted); font-size: 12px; }
     .kpi .value { font-size: 24px; margin-top: 6px; font-weight: 600; }
     .kpi .hint { color: var(--muted); font-size: 11px; margin-top: 4px; }
 
@@ -335,10 +223,6 @@
     th:hover { color: var(--text); }
     .sort-ind { margin-left: 6px; font-size: 11px; color: var(--accent); }
     .tableWrap { max-height: 420px; overflow: auto; border-radius: 16px; border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.02); }
-    .panel.tallTable .tableWrap { max-height: min(640px, 70vh); }
-    @media (max-width: 980px) {
-      .panel.tallTable .tableWrap { max-height: 420px; }
-    }
     tbody tr:nth-child(even) { background: rgba(255,255,255,0.01); }
     tbody tr:hover { background: rgba(122,162,255,0.08); }
     .muted { color: var(--muted); }
@@ -402,76 +286,66 @@
 <body>
   <header>
     <div class="header-inner">
-      <div class="banner-flex">
-        <div class="banner-left">
-          <h1>Ticket Bypass Dashboard</h1>
-          <p class="sub">Drop in your CSV → track bypass volume and response-time impact.</p>
+      <div>
+        <h1>Ticket Bypass Dashboard</h1>
+        <p class="sub">Drop in your CSV → get bypass volume, response-time impact, and category breakdown (sortable tables + pie charts)</p>
+      </div>
+      <div class="controls">
+        <div class="controls-left">
+          <span class="pill">
+            <strong>CSV:</strong>
+            <input id="fileInput" type="file" accept=".csv,text/csv" />
+          </span>
+
+          <span class="pill stretch">
+            <span class="pill-label">Total requests</span>
+            <span class="pill-value" id="bannerTotal">—</span>
+            <span class="pill-sub">All rows in CSV</span>
+          </span>
         </div>
-        <div class="controls">
-          <div class="controls-left">
-            <span class="pill">
-              <strong>CSV:</strong>
-              <input id="fileInput" type="file" accept=".csv,text/csv" />
-            </span>
 
-            <div class="totalWrap">
-              <span class="pill stretch">
-                <span class="pill-label">Total requests</span>
-                <span class="pill-value" id="bannerTotal">—</span>
-              </span>
-
-              <div class="info-dot" tabindex="0" aria-label="Bypass rules and time metric details">
-                ?
-                <div class="tooltip">
-                  <div>
-                    <strong>Bypass rule</strong>
-                    Rows where Better Avenue? starts with “Yes” or Reason Category mentions “bypass”.
-                  </div>
-                  <div>
-                    <strong>Time metric</strong>
-                    Initial Request to 1st Response (working hours only). Excluding Holidays and weekends. 
-                  </div>
-                </div>
+        <div class="controls-right">
+          <div class="info-dot" tabindex="0" aria-label="Bypass rules and time metric details">
+            ?
+            <div class="tooltip">
+              <div>
+                <strong>Bypass rule</strong>
+                Rows where “Was there a better avenue than CSG?” is not blank and not “No”.
+              </div>
+              <div>
+                <strong>Time metric</strong>
+                Initial Request to 1st Response (working hours only). Excluding Holidays and weekends. 
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <div class="tabBar">
-        <button class="tabButton active" data-tab="overview">Overview</button>
-        <button class="tabButton" data-tab="sales">Sales</button>
-        <button class="tabButton" data-tab="customers">Customers</button>
-        <button class="tabButton" data-tab="dealers">Dealers</button>
-        <button class="tabButton" data-tab="other">Other</button>
-      </div>
     </div>
   </header>
 
   <div class="wrap">
-    <section class="tab-panel active" data-tab="overview">
     <div class="panel">
       <h2>Key Metrics</h2>
       <div class="kpis">
         <div class="kpi">
-          <div class="label">Incidents Bypassed</div>
+          <div class="label">Contacts that Bypassed</div>
           <div class="value" id="kpiBypassed">—</div>
-          <div class="hint muted">Better Avenue? starts “Yes” or Reason Category says “bypass”</div>
+          <div class="hint muted"># of contacts that reached bypassing the ticket system.</div>
         </div>
         <div class="kpi">
-          <div class="label">% Bypassed</div>
+          <div class="label">% bypassed</div>
           <div class="value" id="kpiPct">—</div>
           <div class="hint muted">Bypassed / total</div>
         </div>
         <div class="kpi">
-          <div class="label">Avg Response Time</div>
+          <div class="label">Avg response time (hrs)</div>
           <div class="value" id="kpiAvgHrs">—</div>
           <div class="hint muted">Initial → 1st response</div>
         </div>
         <div class="kpi">
-          <div class="label">Response Time Cost</div>
+          <div class="label">Total # of hrs delayed</div>
           <div class="value" id="kpiTotalHrs">—</div>
-          <div class="hint muted">Sum of bypassed response hours</div>
+          <div class="hint muted">Sum of hours spent waiting to reach a tech.</div>
         </div>
       </div>
     </div>
@@ -485,7 +359,7 @@
           <canvas id="pieBypass"></canvas>
         </div>
         <div class="legendWrap" id="legendBypass"></div>
-        <p class="note">Shows how much volume bypasses tickets vs stays in-process.</p>
+        <p class="note">Shows how much volume bypasses the ticket system vs the amount of contacts that were appropriately escalated.</p>
       </div>
 
       <div class="panel">
@@ -510,7 +384,7 @@
     <div style="height:12px"></div>
 
     <div class="row cols-2">
-      <div class="panel tallTable">
+      <div class="panel">
         <h2>Bypass Breakdown by Reason Category</h2>
         <div class="tableWrap">
           <table id="reasonTable">
@@ -530,43 +404,12 @@
       </div>
 
       <div class="panel">
-        <h2>Top 10 Reasons for Bypass</h2>
-        <ol class="topReasons" id="topBypassReasons">
-          <li class="muted topReasons-empty">Upload a CSV to populate this list.</li>
-        </ol>
-        <p class="note">Ranked by bypassed volume. Percentages reference total bypassed traffic.</p>
-      </div>
-    </div>
-
-    <div style="height:12px"></div>
-
-    <div class="row cols-2">
-      <div class="panel">
-        <h2>Escalation Origins (Requester Type + Name)</h2>
-        <div class="tableWrap">
-          <table id="originTable">
-            <thead>
-              <tr>
-                <th data-type="text">Origin<span class="sort-ind"></span></th>
-                <th data-type="number">Count<span class="sort-ind"></span></th>
-                <th data-type="number">% of bypassed<span class="sort-ind"></span></th>
-                <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
-                <th data-type="number">Total hours (bypassed)<span class="sort-ind"></span></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <p class="note">Shows who routed around tickets most often.</p>
-      </div>
-
-      <div class="panel">
-        <h2>Bypass Breakdown by “Who”</h2>
+        <h2>Bypass Breakdown by Requester</h2>
         <div class="tableWrap">
           <table id="whoTable">
             <thead>
               <tr>
-                <th data-type="text">Who<span class="sort-ind"></span></th>
+                <th data-type="text">Requester<span class="sort-ind"></span></th>
                 <th data-type="number">Count<span class="sort-ind"></span></th>
                 <th data-type="number">% of bypassed<span class="sort-ind"></span></th>
                 <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
@@ -576,41 +419,23 @@
             <tbody></tbody>
           </table>
         </div>
-        <p class="note">Derived from the part before “ - ” in Reason Category (e.g., “Dealer - …”).</p>
+        <p class="note">Derived from Requester Type + Requester Name.</p>
       </div>
     </div>
 
     <div style="height:12px"></div>
 
+
     <div class="panel">
       <h2>Bypassed Requests</h2>
       <p class="note">
-        Shows the first 250 bypassed rows (for performance). Row # aligns to the CSV so you can trace records quickly, and Response Time now displays fractional hours (or plain minutes when under an hour, or “Insufficient data” when timestamps are missing). Use your browser Find (Ctrl/Cmd+F) to filter.
+        Shows the first 250 bypassed rows (for performance). You can filter/search by using your browser Find (Ctrl/Cmd+F).
       </p>
       <div class="tableWrap" style="max-height:520px;">
         <table id="sampleTable">
           <thead><tr id="sampleHead"></tr></thead>
           <tbody id="sampleBody"></tbody>
         </table>
-      </div>
-    </div>
-
-    <div style="height:12px"></div>
-
-    <div class="row cols-2">
-      <div class="panel">
-        <h2>Column Mapping (auto-detected)</h2>
-        <div class="muted" id="mapping"></div>
-        <p class="note">
-          If the dashboard isn’t detecting correctly, open this HTML file and adjust the mapping logic in <code>detectColumns()</code>.
-        </p>
-      </div>
-
-      <div class="panel">
-        <h2>Data Quality Checks</h2>
-        <div id="dq" class="muted" style="line-height:1.6">
-          Upload a CSV to see checks (missing timestamps, negative durations, etc.).
-        </div>
       </div>
     </div>
 
@@ -623,7 +448,7 @@
         <div class="math-notes-content">
           <p>All KPIs, charts, and tables lean on a shared set of rules so the counts stay in sync:</p>
           <ul>
-            <li><strong>Bypassed count</strong>: a row qualifies when Better Avenue? starts with “Yes” or its Reason Category contains “bypass”.</li>
+            <li><strong>Bypassed count</strong>: a row qualifies when “Was there a better avenue than CSG?” is not blank and not “No”.</li>
             <li><strong>% bypassed</strong>: bypassed rows divided by total parsed rows, displayed as a percentage.</li>
             <li><strong>Average response hours</strong>: arithmetic mean of the working-hour durations for all bypassed rows with valid timestamps.</li>
             <li><strong>Total hours</strong>: sum of those same working-hour durations, capped at zero to avoid negative anomalies.</li>
@@ -636,207 +461,23 @@
             <li>U.S. holidays (New Year’s Day, MLK Day, Presidents Day, Memorial Day, Independence Day, Labor Day, Thanksgiving + day after, and Christmas) are also excluded via a cached lookup.</li>
             <li>Durations accumulate day-by-day: for each qualifying day we add the overlap between the request/response timestamps and the work window, ensuring only productive hours remain.</li>
           </ul>
+
+          <div class="row cols-2">
+            <div class="panel">
+              <h2>Column Mapping (auto-detected)</h2>
+              <div class="muted" id="mapping"></div>
+            </div>
+
+            <div class="panel">
+              <h2>Data Quality Checks</h2>
+              <div id="dq" class="muted" style="line-height:1.6">
+                Upload a CSV to see checks (missing timestamps, negative durations, etc.).
+              </div>
+            </div>
+          </div>
         </div>
       </details>
     </div>
-    </section>
-
-    <section class="tab-panel" data-tab="sales">
-      <div class="panel">
-        <h2>Sales Participation KPIs</h2>
-        <div class="kpis">
-          <div class="kpi">
-            <div class="label">Sales incidents</div>
-            <div class="value" id="salesTotal">—</div>
-            <div class="hint muted">Any row involving Sales (bypassed or not)</div>
-          </div>
-          <div class="kpi">
-            <div class="label">% of total incidents</div>
-            <div class="value" id="salesPct">—</div>
-            <div class="hint muted">Sales incidents / total rows</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Sales bypassed</div>
-            <div class="value" id="salesBypassed">—</div>
-            <div class="hint muted">Sales rows that sidestepped tickets</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Avg response (hrs)</div>
-            <div class="value" id="salesAvg">—</div>
-            <div class="hint muted">Working hours until first response</div>
-          </div>
-        </div>
-      </div>
-
-      <div style="height:12px"></div>
-
-      <div class="row cols-2">
-        <div class="panel">
-          <h2>Sales Incidents by Month</h2>
-          <div class="chartBox">
-            <canvas id="salesMonthlyChart"></canvas>
-          </div>
-          <p class="note">Bars = Sales incidents per month, line = Sales % of all incidents for that month. Quick way to watch both volume and share.</p>
-        </div>
-
-        <div class="panel">
-          <h2>Top Sales Reasons</h2>
-          <div class="tableWrap">
-            <table id="salesReasonTable">
-              <thead>
-                <tr>
-                  <th data-type="text">Reason Category<span class="sort-ind"></span></th>
-                  <th data-type="text">Origin<span class="sort-ind"></span></th>
-                  <th data-type="number">Count<span class="sort-ind"></span></th>
-                  <th data-type="number">% of sales incidents<span class="sort-ind"></span></th>
-                  <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-          <p class="note">Focuses on the top 10 drivers so we can see which Sales escalations stay open longest.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="tab-panel" data-tab="customers">
-      <div class="panel">
-        <h2>Customer Segment KPIs</h2>
-        <div class="kpis">
-          <div class="kpi">
-            <div class="label">Customer incidents</div>
-            <div class="value" id="customerTotal">—</div>
-            <div class="hint muted">Rows where customers drove the request</div>
-          </div>
-          <div class="kpi">
-            <div class="label">% of total incidents</div>
-            <div class="value" id="customerPct">—</div>
-            <div class="hint muted">Customer incidents / total rows</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Customer bypassed</div>
-            <div class="value" id="customerBypassed">—</div>
-            <div class="hint muted">Customer rows that skipped tickets</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Avg response (hrs)</div>
-            <div class="value" id="customerAvg">—</div>
-            <div class="hint muted">Working hours until first response</div>
-          </div>
-        </div>
-      </div>
-      <div style="height:12px"></div>
-      <div class="panel">
-        <h2>Customer Reason Breakdown</h2>
-        <div class="tableWrap">
-          <table id="customerSegmentTable">
-            <thead>
-              <tr>
-                <th data-type="text">Reason Category<span class="sort-ind"></span></th>
-                <th data-type="number">Count<span class="sort-ind"></span></th>
-                <th data-type="number">% of customer incidents<span class="sort-ind"></span></th>
-                <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <p class="note">Shows which customer requests show up most frequently and how long they take.</p>
-      </div>
-    </section>
-
-    <section class="tab-panel" data-tab="dealers">
-      <div class="panel">
-        <h2>Dealer Segment KPIs</h2>
-        <div class="kpis">
-          <div class="kpi">
-            <div class="label">Dealer incidents</div>
-            <div class="value" id="dealerTotal">—</div>
-            <div class="hint muted">Rows initiated by dealer teams</div>
-          </div>
-          <div class="kpi">
-            <div class="label">% of total incidents</div>
-            <div class="value" id="dealerPct">—</div>
-            <div class="hint muted">Dealer incidents / total rows</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Dealer bypassed</div>
-            <div class="value" id="dealerBypassed">—</div>
-            <div class="hint muted">Dealer rows that skipped tickets</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Avg response (hrs)</div>
-            <div class="value" id="dealerAvg">—</div>
-            <div class="hint muted">Working hours until first response</div>
-          </div>
-        </div>
-      </div>
-      <div style="height:12px"></div>
-      <div class="panel">
-        <h2>Dealer Reason Breakdown</h2>
-        <div class="tableWrap">
-          <table id="dealerSegmentTable">
-            <thead>
-              <tr>
-                <th data-type="text">Reason Category<span class="sort-ind"></span></th>
-                <th data-type="number">Count<span class="sort-ind"></span></th>
-                <th data-type="number">% of dealer incidents<span class="sort-ind"></span></th>
-                <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <p class="note">Use to spotlight which dealer interactions are draining the queue.</p>
-      </div>
-    </section>
-
-    <section class="tab-panel" data-tab="other">
-      <div class="panel">
-        <h2>Other Segment KPIs</h2>
-        <div class="kpis">
-          <div class="kpi">
-            <div class="label">Other incidents</div>
-            <div class="value" id="otherTotal">—</div>
-            <div class="hint muted">Internal, operations, marketing, etc.</div>
-          </div>
-          <div class="kpi">
-            <div class="label">% of total incidents</div>
-            <div class="value" id="otherPct">—</div>
-            <div class="hint muted">Other incidents / total rows</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Other bypassed</div>
-            <div class="value" id="otherBypassed">—</div>
-            <div class="hint muted">Other rows that skipped tickets</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Avg response (hrs)</div>
-            <div class="value" id="otherAvg">—</div>
-            <div class="hint muted">Working hours until first response</div>
-          </div>
-        </div>
-      </div>
-      <div style="height:12px"></div>
-      <div class="panel">
-        <h2>Other Reason Breakdown</h2>
-        <div class="tableWrap">
-          <table id="otherSegmentTable">
-            <thead>
-              <tr>
-                <th data-type="text">Reason Category<span class="sort-ind"></span></th>
-                <th data-type="number">Count<span class="sort-ind"></span></th>
-                <th data-type="number">% of other incidents<span class="sort-ind"></span></th>
-                <th data-type="number">Avg response (hrs)<span class="sort-ind"></span></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <p class="note">Covers ops, product, finance, and any remaining categories.</p>
-      </div>
-    </section>
   </div>
 
 <script>
@@ -871,25 +512,11 @@ function detectColumns(headers) {
     n => (n.includes("initial") && n.includes("request"))
   ]);
 
-  const initialRequestTime = find([
-    n => n.includes("initial request timing"),
-    n => n.includes("initial request time"),
-    n => (n.includes("initial") && n.includes("timing"))
-  ]);
-
   const firstResponse = find([
     n => n.includes("1st response"),
     n => n.includes("first response"),
     n => (n.includes("1st") && n.includes("response")),
     n => (n.includes("first") && n.includes("response"))
-  ]);
-
-  const firstResponseTime = find([
-    n => n.includes("1st response timing"),
-    n => n.includes("1st response time"),
-    n => n.includes("first response timing"),
-    n => n.includes("first response time"),
-    n => (n.includes("response") && n.includes("timing"))
   ]);
 
   const requesterType = find([
@@ -907,7 +534,7 @@ function detectColumns(headers) {
     n => n.includes("subject line")
   ]);
 
-  return { betterAvenue, reasonCategory, initialRequest, initialRequestTime, firstResponse, firstResponseTime, requesterType, requesterName, channel };
+  return { betterAvenue, reasonCategory, initialRequest, firstResponse, requesterType, requesterName, channel };
 }
 
 // Safely convert arbitrary timestamp strings into Date objects
@@ -920,39 +547,12 @@ function toDate(val) {
   return d;
 }
 
-function combineDateTime(dateVal, timeVal) {
-  const datePart = (dateVal ?? "").toString().trim();
-  const timePart = (timeVal ?? "").toString().trim();
-  if (!datePart && !timePart) return null;
-  if (datePart && timePart) {
-    const combined = toDate(`${datePart} ${timePart}`);
-    if (combined) return combined;
-  }
-  return toDate(datePart || timePart);
-}
-
-function resolveTimestamp(row, dateKey, timeKey) {
-  const dateVal = dateKey ? row[dateKey] : null;
-  const timeVal = timeKey ? row[timeKey] : null;
-  return combineDateTime(dateVal, timeVal);
-}
-
-// Business rule: Better Avenue must explicitly start with "Yes"
-function containsYesTicket(val) {
-  if (val == null) return false;
-  const s = String(val).trim().toLowerCase();
-  return s.startsWith("yes");
-}
-
-// Business rule: any Reason Category mentioning "bypass" counts
-function reasonCategoryBypasses(val) {
-  if (val == null) return false;
-  return String(val).toLowerCase().includes("bypass");
-}
-
-// Consolidated bypass check shared across KPI + tables + DQ
-function isBypassEvent(betterAvenueVal, reasonCategoryVal) {
-  return containsYesTicket(betterAvenueVal) || reasonCategoryBypasses(reasonCategoryVal);
+// Business rule: bypassed when Better Avenue column is not blank and not "No"
+function isBypassEvent(betterAvenueVal) {
+  if (betterAvenueVal == null) return false;
+  const s = String(betterAvenueVal).trim().toLowerCase();
+  if (!s) return false;
+  return s !== "no";
 }
 
 function getWho(reasonCategory) {
@@ -960,19 +560,6 @@ function getWho(reasonCategory) {
   const s = String(reasonCategory);
   const parts = s.split(" - ");
   return parts[0]?.trim() || "Unknown";
-}
-
-function classifyWhoGroup(reasonCategory, requesterType) {
-  const reason = (reasonCategory ?? "").toString().toLowerCase();
-  const requester = (requesterType ?? "").toString().toLowerCase();
-  if (reason.includes("sales") || requester.includes("sales")) return "Sales";
-  if (reason.includes("dealer") || requester.includes("dealer")) return "Dealer";
-  if (reason.includes("customer") || requester.includes("customer")) return "Customer";
-  return "Other";
-}
-
-function isSalesInvolved(row) {
-  return (row?.__whoGroup || "").toLowerCase() === "sales";
 }
 
 // -----------------------------------------------------------------------------
@@ -1112,17 +699,17 @@ function fmtPct(x, digits=2) {
   return `${x.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits })}%`;
 }
 
-function formatResponseTime(hours) {
-  if (hours == null || !isFinite(hours) || hours < 0) return "Insufficient data";
-  if (hours >= 1) return `${fmtNumber(hours, 2)} hrs`;
-  const minutes = Math.round(hours * 60);
-  const label = minutes === 1 ? "min" : "mins";
-  return `${minutes} ${label}`;
-}
-
 function cleanText(val, fallback="Unknown") {
   const s = (val ?? "").toString().trim();
   return s || fallback;
+}
+
+function rowHasValues(row) {
+  if (!row) return false;
+  return Object.values(row).some(val => {
+    if (val == null) return false;
+    return String(val).trim() !== "";
+  });
 }
 
 function setTableEmpty(tableId, columnsLength, message) {
@@ -1142,13 +729,11 @@ function setTableEmpty(tableId, columnsLength, message) {
 let chartBypass = null;
 let chartReason = null;
 let chartWho = null;
-let chartSalesMonthly = null;
 
 function setKpis({ total, bypassed, pct, avgHrs, totalHrs }) {
   const bannerTotal = document.getElementById("bannerTotal");
   if (bannerTotal) bannerTotal.textContent = fmtNumber(total);
-  const bypassVal = fmtNumber(bypassed);
-  document.getElementById("kpiBypassed").textContent = bypassVal === "—" ? "—" : `${bypassVal} Incidents`;
+  document.getElementById("kpiBypassed").textContent = fmtNumber(bypassed);
   document.getElementById("kpiPct").textContent = fmtPct(pct, 2);
 
   // Add a little severity coloring on bypass pct
@@ -1158,18 +743,14 @@ function setKpis({ total, bypassed, pct, avgHrs, totalHrs }) {
   else if (pct >= 25) pctEl.classList.add("warn");
   else pctEl.classList.add("ok");
 
-  const avgVal = fmtNumber(avgHrs, 2);
-  document.getElementById("kpiAvgHrs").textContent = avgVal === "—" ? "—" : `${avgVal} hrs`;
-
-  const totalVal = fmtNumber(totalHrs, 0);
-  document.getElementById("kpiTotalHrs").textContent = totalVal === "—" ? "—" : `${totalVal} hrs lost`;
+  document.getElementById("kpiAvgHrs").textContent = fmtNumber(avgHrs, 2);
+  document.getElementById("kpiTotalHrs").textContent = fmtNumber(totalHrs, 0);
 }
 
 function destroyCharts() {
   if (chartBypass) { chartBypass.destroy(); chartBypass = null; }
   if (chartReason) { chartReason.destroy(); chartReason = null; }
   if (chartWho) { chartWho.destroy(); chartWho = null; }
-  if (chartSalesMonthly) { chartSalesMonthly.destroy(); chartSalesMonthly = null; }
   clearLegend("legendBypass");
   clearLegend("legendReason");
   clearLegend("legendWho");
@@ -1229,7 +810,7 @@ function makePie(canvasId, labels, values, titleText, legendId) {
 
 // Data-quality summary to call out missing timestamps immediately
 function summarizeDQ(rows, cols) {
-  const { betterAvenue, reasonCategory, initialRequest, initialRequestTime, firstResponse, firstResponseTime } = cols;
+  const { betterAvenue, reasonCategory, initialRequest, firstResponse } = cols;
 
   let missingBetter = 0, missingReason = 0, missingInit = 0, missingFirst = 0;
   let bypassed = 0;
@@ -1238,12 +819,12 @@ function summarizeDQ(rows, cols) {
   for (const r of rows) {
     if (!r[betterAvenue]) missingBetter++;
     if (!r[reasonCategory]) missingReason++;
-    const init = resolveTimestamp(r, initialRequest, initialRequestTime);
-    const first = resolveTimestamp(r, firstResponse, firstResponseTime);
+    const init = toDate(r[initialRequest]);
+    const first = toDate(r[firstResponse]);
     if (!init) missingInit++;
     if (!first) missingFirst++;
 
-    const isBypass = isBypassEvent(r[betterAvenue], r[reasonCategory]);
+    const isBypass = isBypassEvent(r[betterAvenue]);
     if (isBypass) {
       bypassed++;
       const h = hoursBetween(init, first);
@@ -1271,15 +852,11 @@ function groupStats(rows, keyFn) {
   const m = new Map();
   for (const r of rows) {
     const k = keyFn(r);
-    if (!m.has(k)) m.set(k, { key: k, count: 0, sumHrs: 0, avgHrs: null, origins: new Map() });
+    if (!m.has(k)) m.set(k, { key: k, count: 0, sumHrs: 0, avgHrs: null });
     const g = m.get(k);
     g.count += 1;
     const h = r.__respHours;
     if (h != null && isFinite(h)) g.sumHrs += h;
-    if (r.__whoGroup) {
-      const originKey = r.__whoGroup;
-      g.origins.set(originKey, (g.origins.get(originKey) || 0) + 1);
-    }
   }
   const arr = Array.from(m.values());
   for (const g of arr) {
@@ -1358,70 +935,46 @@ function makeSortable(table) {
 // Show the first ~250 bypassed rows for anecdotal review
 function renderSampleTable(bypassedRowsRaw, headers, cols) {
   const sample = bypassedRowsRaw.slice(0, 250);
+
+  // Show a useful subset first, but keep it robust if headers vary
+  const preferred = [
+    cols.reasonCategory,
+    cols.betterAvenue,
+    cols.initialRequest,
+    cols.firstResponse,
+    "__respHours"
+  ].filter(Boolean);
+
+  const other = headers.filter(h => !preferred.includes(h));
+  const shown = [...preferred, ...other].slice(0, 12); // keep table readable; adjust if you want more columns
+
   const headRow = document.getElementById("sampleHead");
   const body = document.getElementById("sampleBody");
   headRow.innerHTML = "";
   body.innerHTML = "";
 
-  const columns = [
-    {
-      label: "Row #",
-      type: "number",
-      getter: (row) => row.__rowNum ?? "—"
-    },
-    {
-      label: "Reason Category",
-      type: "text",
-      getter: (row) => cleanText(row[cols.reasonCategory], "Unknown")
-    },
-    {
-      label: "Response Time",
-      type: "text",
-      getter: (row) => formatResponseTime(row.__respHours)
-    },
-    {
-      label: "Requester Type",
-      type: "text",
-      getter: (row) => cols.requesterType ? cleanText(row[cols.requesterType], "Unknown") : "Not mapped"
-    },
-    {
-      label: "Requester Name",
-      type: "text",
-      getter: (row) => cols.requesterName ? cleanText(row[cols.requesterName], "Unnamed") : "Not mapped"
-    }
-  ];
-
-  columns.forEach(col => {
+  for (const h of shown) {
     const th = document.createElement("th");
-    th.textContent = col.label;
-    th.setAttribute("data-type", col.type);
+    th.textContent = h === "__respHours" ? "Response Time (hrs)" : h;
+    th.setAttribute("data-type", h === "__respHours" ? "number" : "text");
     const ind = document.createElement("span");
     ind.className = "sort-ind";
     th.appendChild(ind);
     headRow.appendChild(th);
-  });
-
-  if (!sample.length) {
-    const tr = document.createElement("tr");
-    const td = document.createElement("td");
-    td.colSpan = columns.length;
-    td.textContent = "No bypassed requests detected.";
-    td.className = "muted";
-    tr.appendChild(td);
-    body.appendChild(tr);
-    return;
   }
 
-  sample.forEach(row => {
+  for (const r of sample) {
     const tr = document.createElement("tr");
-    columns.forEach(col => {
+    for (const h of shown) {
       const td = document.createElement("td");
-      td.textContent = col.getter(row);
+      if (h === "__respHours") td.textContent = fmtNumber(r.__respHours, 2);
+      else td.textContent = (r[h] ?? "");
       tr.appendChild(td);
-    });
+    }
     body.appendChild(tr);
-  });
+  }
 
+  // Make sortable by wrapping in a temporary table element reference
   const table = document.getElementById("sampleTable");
   makeSortable(table);
 }
@@ -1434,213 +987,6 @@ function renderMapping(cols) {
     return `<div><span class="badge">${label}</span> <strong>${v ?? "NOT FOUND"}</strong></div>`;
   });
   el.innerHTML = entries.join("");
-}
-
-function dominantOrigin(originMap) {
-  if (!originMap || !originMap.size) return "Unknown";
-  let topKey = "Unknown";
-  let topCount = -1;
-  for (const [key, count] of originMap.entries()) {
-    if (count > topCount) {
-      topCount = count;
-      topKey = key;
-    }
-  }
-  return topKey;
-}
-
-function renderSegmentKpis(prefix, segmentRows, totalRows) {
-  const total = segmentRows.length;
-  const pct = totalRows ? (total / totalRows * 100) : 0;
-  const bypassed = segmentRows.filter(r => r.__isBypassed).length;
-  const hrs = segmentRows.map(r => r.__respHours).filter(h => h != null && isFinite(h) && h >= 0);
-  const avg = hrs.length ? (hrs.reduce((a,b) => a + b, 0) / hrs.length) : null;
-
-  const setText = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val;
-  };
-
-  setText(`${prefix}Total`, fmtNumber(total, 0));
-  setText(`${prefix}Pct`, fmtPct(pct, 2));
-  setText(`${prefix}Bypassed`, fmtNumber(bypassed, 0));
-  setText(`${prefix}Avg`, fmtNumber(avg, 2));
-}
-
-function renderReasonBreakdown(rows, cols, tableId, totalCount, limit=null, options={}) {
-  if (!document.getElementById(tableId)) return;
-  const stats = groupStats(rows, r => cleanText(r[cols.reasonCategory], "Unknown"));
-  const sliced = typeof limit === "number" ? stats.slice(0, limit) : stats;
-  const includeOrigin = options.includeOrigin;
-  const formatted = sliced.map(g => ({
-    reason: g.key,
-    origin: includeOrigin ? dominantOrigin(g.origins) : undefined,
-    count: g.count,
-    pct: totalCount ? (g.count / totalCount * 100) : 0,
-    avg: g.avgHrs
-  }));
-
-  const columns = [
-    { key: "reason", format: v => v }
-  ];
-  if (includeOrigin) columns.push({ key: "origin", format: v => v || "Unknown" });
-  columns.push(
-    { key: "count", format: v => fmtNumber(v,0) },
-    { key: "pct", format: v => fmtPct(v,2) },
-    { key: "avg", format: v => fmtNumber(v,2) }
-  );
-
-  fillTable(tableId, formatted, columns, "No incidents found for this slice.");
-}
-
-function renderTopBypassReasons(reasonStats, bypassedCount) {
-  const list = document.getElementById("topBypassReasons");
-  if (!list) return;
-  list.innerHTML = "";
-
-  if (!reasonStats.length) {
-    const li = document.createElement("li");
-    li.className = "muted topReasons-empty";
-    li.textContent = "No bypassed requests yet.";
-    list.appendChild(li);
-    return;
-  }
-
-  const top = reasonStats.slice(0, 10);
-  top.forEach((item, idx) => {
-    const li = document.createElement("li");
-    if (idx < 5) li.classList.add("topReasons-hot");
-    const rank = document.createElement("span");
-    rank.className = "rank";
-    rank.textContent = idx + 1;
-
-    const body = document.createElement("div");
-    const name = document.createElement("div");
-    name.className = "reason-name";
-    name.textContent = item.key;
-
-    const pct = bypassedCount ? (item.count / bypassedCount * 100) : 0;
-    const meta = document.createElement("div");
-    meta.className = "reason-meta";
-    meta.textContent = `${fmtNumber(item.count, 0)} • ${fmtPct(pct, 1)}`;
-
-    body.appendChild(name);
-    body.appendChild(meta);
-    li.appendChild(rank);
-    li.appendChild(body);
-    list.appendChild(li);
-  });
-}
-
-function monthlyCount(rows) {
-  const map = new Map();
-  for (const r of rows) {
-    const d = r.__init;
-    if (!d) continue;
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    map.set(key, (map.get(key) || 0) + 1);
-  }
-  return map;
-}
-
-function formatMonthKey(key) {
-  const [year, month] = key.split("-").map(Number);
-  if (!year || !month) return key;
-  const date = new Date(year, month - 1, 1);
-  return date.toLocaleString(undefined, { month: "short", year: "numeric" });
-}
-
-function renderSalesTab(rows, cols, totalRows) {
-  const salesRows = rows.filter(r => isSalesInvolved(r));
-  renderSegmentKpis("sales", salesRows, totalRows);
-
-  const canvas = document.getElementById("salesMonthlyChart");
-  if (canvas) {
-    const allCounts = monthlyCount(rows);
-    const salesCounts = monthlyCount(salesRows);
-    const labelsKeys = Array.from(salesCounts.keys()).sort();
-
-    if (!labelsKeys.length) {
-      if (chartSalesMonthly) { chartSalesMonthly.destroy(); chartSalesMonthly = null; }
-      const ctx = canvas.getContext("2d");
-      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-      return;
-    }
-
-    const labels = labelsKeys.map(formatMonthKey);
-    const salesVals = labelsKeys.map(key => salesCounts.get(key) || 0);
-    const shares = labelsKeys.map(key => {
-      const total = allCounts.get(key) || 0;
-      const salesVal = salesCounts.get(key) || 0;
-      return total ? (salesVal / total * 100) : 0;
-    });
-
-    if (chartSalesMonthly) { chartSalesMonthly.destroy(); chartSalesMonthly = null; }
-    chartSalesMonthly = new Chart(canvas, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [
-          {
-            label: "Sales incidents",
-            data: salesVals,
-            backgroundColor: "rgba(90,115,196,0.6)",
-            borderColor: "rgba(90,115,196,1)",
-            borderWidth: 1,
-            yAxisID: "y"
-          },
-          {
-            label: "Sales % of total",
-            type: "line",
-            data: shares,
-            borderColor: "#fb7185",
-            backgroundColor: "#fb7185",
-            tension: 0.3,
-            borderWidth: 2,
-            fill: false,
-            pointRadius: 3,
-            yAxisID: "y1"
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { color: "#d6dcf7" },
-            grid: { color: "rgba(255,255,255,0.08)" },
-            title: { display: true, text: "Sales incidents", color: "#d6dcf7" }
-          },
-          y1: {
-            beginAtZero: true,
-            position: "right",
-            grid: { drawOnChartArea: false },
-            ticks: {
-              color: "#d6dcf7",
-              callback: (value) => `${value}%`
-            },
-            title: { display: true, text: "Sales % of total", color: "#d6dcf7" }
-          },
-          x: { ticks: { color: "#d6dcf7" }, grid: { color: "rgba(255,255,255,0.04)" } }
-        },
-        plugins: {
-          legend: { labels: { color: "#d6dcf7" } }
-        }
-      }
-    });
-  }
-
-  renderReasonBreakdown(salesRows, cols, "salesReasonTable", salesRows.length, 10, { includeOrigin: true });
-}
-
-function renderSegmentTab(segmentName, rows, cols, totalRows) {
-  const segmentRows = rows.filter(r => (r.__whoGroup || "").toLowerCase() === segmentName.toLowerCase());
-  const prefix = segmentName.toLowerCase();
-  renderSegmentKpis(prefix, segmentRows, totalRows);
-  const tableId = `${prefix}SegmentTable`;
-  renderReasonBreakdown(segmentRows, cols, tableId, segmentRows.length);
 }
 
 // Main pipeline orchestrator
@@ -1657,27 +1003,19 @@ function buildDashboard(data, headers) {
     return;
   }
 
+  // Drop empty rows (e.g., trailing lines) so totals stay accurate
+  const cleaned = data.filter(rowHasValues);
+
   // Compute response hours per row
-  const rows = data.map((r, idx) => {
-    const init = resolveTimestamp(r, cols.initialRequest, cols.initialRequestTime);
-    const first = resolveTimestamp(r, cols.firstResponse, cols.firstResponseTime);
+  const rows = cleaned.map(r => {
+    const init = toDate(r[cols.initialRequest]);
+    const first = toDate(r[cols.firstResponse]);
     const respHrs = hoursBetween(init, first);
-    const bypassFlag = isBypassEvent(r[cols.betterAvenue], r[cols.reasonCategory]);
-    const requesterVal = cols.requesterType ? r[cols.requesterType] : "";
-    const whoGroup = classifyWhoGroup(r[cols.reasonCategory], requesterVal);
-    return {
-      ...r,
-      __init: init,
-      __first: first,
-      __respHours: (respHrs != null && isFinite(respHrs)) ? respHrs : null,
-      __rowNum: idx + 2, // +2 to account for the header row in the CSV
-      __isBypassed: bypassFlag,
-      __whoGroup: whoGroup
-    };
+    return { ...r, __init: init, __first: first, __respHours: (respHrs != null && isFinite(respHrs)) ? respHrs : null };
   });
 
   const total = rows.length;
-  const bypassedRows = rows.filter(r => r.__isBypassed);
+  const bypassedRows = rows.filter(r => isBypassEvent(r[cols.betterAvenue]));
   const bypassed = bypassedRows.length;
   const pct = total ? (bypassed / total * 100) : 0;
 
@@ -1707,54 +1045,37 @@ function buildDashboard(data, headers) {
     { key: "avg", format: v => fmtNumber(v,2) },
     { key: "totalHrs", format: v => fmtNumber(v,0) }
   ]);
-  renderTopBypassReasons(reasonStats, bypassed);
 
-  // Group by Who (Dealer/Customer/Sales/Internal)
-  const whoStats = groupStats(bypassedRows, r => getWho(r[cols.reasonCategory]));
-  const whoTableRows = whoStats.map(g => ({
-    who: g.key,
-    count: g.count,
-    pct: bypassed ? (g.count / bypassed * 100) : 0,
-    avg: g.avgHrs,
-    totalHrs: g.sumHrs
-  }));
-  fillTable("whoTable", whoTableRows, [
-    { key: "who", format: v => v },
-    { key: "count", format: v => fmtNumber(v,0) },
-    { key: "pct", format: v => fmtPct(v,2) },
-    { key: "avg", format: v => fmtNumber(v,2) },
-    { key: "totalHrs", format: v => fmtNumber(v,0) }
-  ]);
-
-  const originColumns = [
-    { key: "origin", format: v => v },
-    { key: "count", format: v => fmtNumber(v,0) },
-    { key: "pct", format: v => fmtPct(v,2) },
-    { key: "avg", format: v => fmtNumber(v,2) },
-    { key: "totalHrs", format: v => fmtNumber(v,0) }
-  ];
+  // Group by Requester (Requester Type + Requester Name)
+  let whoTableRows = [];
   if (cols.requesterType && cols.requesterName) {
-    const originStats = groupStats(
+    const whoStats = groupStats(
       bypassedRows,
       r => `${cleanText(r[cols.requesterType], "Unknown Type")} - ${cleanText(r[cols.requesterName], "Unnamed")}`
     );
-    const originRows = originStats.map(g => ({
-      origin: g.key,
+    whoTableRows = whoStats.map(g => ({
+      who: g.key,
       count: g.count,
       pct: bypassed ? (g.count / bypassed * 100) : 0,
       avg: g.avgHrs,
       totalHrs: g.sumHrs
     }));
-    fillTable("originTable", originRows, originColumns, "No bypassed requests with requester info.");
+    fillTable("whoTable", whoTableRows, [
+      { key: "who", format: v => v },
+      { key: "count", format: v => fmtNumber(v,0) },
+      { key: "pct", format: v => fmtPct(v,2) },
+      { key: "avg", format: v => fmtNumber(v,2) },
+      { key: "totalHrs", format: v => fmtNumber(v,0) }
+    ], "No bypassed requests with requester info.");
   } else {
-    setTableEmpty("originTable", originColumns.length, "Requester Type/Name columns not detected. Update detectColumns().");
+    setTableEmpty("whoTable", 5, "Requester Type/Name columns not detected. Update detectColumns().");
   }
 
   // Charts
   destroyCharts();
   chartBypass = makePie(
     "pieBypass",
-    ["Bypassed (should’ve been ticket)", "Not bypassed"],
+    ["Contacts that Bypassed", "Not bypassed"],
     [bypassed, Math.max(0, total - bypassed)],
     "Bypassed vs Not Bypassed",
     "legendBypass"
@@ -1776,9 +1097,15 @@ function buildDashboard(data, headers) {
     "legendReason"
   );
 
+  const whoChartStats = groupStats(bypassedRows, r => getWho(r[cols.reasonCategory]));
+  const whoChartRows = whoChartStats.map(g => ({
+    who: g.key,
+    count: g.count
+  }));
+
   const whoTopN = 8;
-  const whoTop = whoTableRows.slice(0, whoTopN);
-  const whoOther = whoTableRows.slice(whoTopN).reduce((s,r) => s + r.count, 0);
+  const whoTop = whoChartRows.slice(0, whoTopN);
+  const whoOther = whoChartRows.slice(whoTopN).reduce((s,r) => s + r.count, 0);
   const whoLabels = whoTop.map(r => r.who);
   const whoValues = whoTop.map(r => r.count);
   if (whoOther > 0) {
@@ -1796,12 +1123,6 @@ function buildDashboard(data, headers) {
 
   // Sample table of bypassed requests
   renderSampleTable(bypassedRows, headers, cols);
-
-  // Tab-specific renders
-  renderSalesTab(rows, cols, total);
-  renderSegmentTab("Customer", rows, cols, total);
-  renderSegmentTab("Dealer", rows, cols, total);
-  renderSegmentTab("Other", rows, cols, total);
 }
 
 // Wire up CSV upload to PapaParse
@@ -1821,20 +1142,6 @@ document.getElementById("fileInput").addEventListener("change", (e) => {
     error: (err) => alert("CSV parse error: " + err.message)
   });
 });
-
-function setupTabs() {
-  const buttons = document.querySelectorAll(".tabButton");
-  const panels = document.querySelectorAll(".tab-panel");
-  buttons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const target = btn.dataset.tab;
-      buttons.forEach(b => b.classList.toggle("active", b.dataset.tab === target));
-      panels.forEach(panel => panel.classList.toggle("active", panel.dataset.tab === target));
-    });
-  });
-}
-
-setupTabs();
 
 </script>
 </body>
